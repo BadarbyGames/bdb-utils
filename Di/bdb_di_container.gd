@@ -40,7 +40,7 @@ func fetch(request):
 		return tmp.value.call(self)
 	return tmp.value
 		
-func require(request:Script):
+func require(request):
 	var item = fetch(request)
 	if not item:
 		if request is Script:
