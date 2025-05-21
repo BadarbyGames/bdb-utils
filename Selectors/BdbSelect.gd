@@ -14,8 +14,14 @@ static func item_by_type(items:Array, type):
 static func children_by_type(parent:Node, type):
 	return items_by_type(parent.get_children(),type)
  
-static func items_by_type(items:Array, type) -> Array:
-	return items.filter(func (i): return is_instance_of(i, type))    
+"""
+Override result
+"""
+static func items_by_type(items:Array, type, result:Variant = []) -> Variant:
+	for item in items:
+		if is_instance_of(item, type):
+			result.append(item)
+	return result
 #endregion
 
 #region by_name
