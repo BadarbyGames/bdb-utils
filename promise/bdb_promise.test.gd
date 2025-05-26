@@ -1,8 +1,7 @@
-"""
 extends SimpleTest
 
 func it_should_complete_await_only_after_resolve():
-	var future = Future.new()
+	var future = BdbPromise.new()
 	var state = { "ctr": 100}
 
 	future.then(func (_u): state.ctr = 200)
@@ -11,9 +10,9 @@ func it_should_complete_await_only_after_resolve():
 	future.resolve()
 	await wait(1)
 	expect(state.ctr).to.equal(200, "Should now be 200 now that resolved been called")
-	
+
 func it_should_complete_await_after_reject():
-	var future = Future.new()
+	var future = BdbPromise.new()
 	var state = { "ctr": 100}
 
 	future.catch(func (): 
@@ -26,7 +25,7 @@ func it_should_complete_await_after_reject():
 	
 
 func it_should_chain_then():
-	var future = Future.new()
+	var future = BdbPromise.new()
 	var state = { 
 			"a": 1,
 			"b": 10,
@@ -70,16 +69,16 @@ func it_all_only_resolves_after_all_promises_done():
 	var future1 := create_resolve_future(0.1)
 	var future2 := create_resolve_future(0.2)
 	var future3 := create_reject_future(0.3)
-	var future_all = Future.all([
+	var future_all = BdbPromise.all([
 		future1,
 		future2,
 		future3
 	])
 	
 	await future1.completed()
-	expect(future1.fulfilled).to.equal([0.1,null], "Future 1 done")
-	expect(future2.fulfilled).to.NOT.equal([0.2,null],"Future 2 NOT yet done")
-	expect(future3.fulfilled).to.NOT.equal([null,0.3],"Future 1 NOT yet done")
+	expect(future1.fulfilled).to.equal([0.1,null], "BdbPromise")
+	expect(future2.fulfilled).to.NOT.equal([0.2,null],"BdbPromise")
+	expect(future3.fulfilled).to.NOT.equal([null,0.3],"BdbPromise")
 	expect(future_all.fulfilled).to.equal(null, "This should not resolve the entire future until all 3 are done")
 	
 	await future2.completed()
@@ -100,24 +99,21 @@ func _process(delta: float) -> void:
 	time_elapsed += delta
 	
 func it_can_poll():
-	await Future.poll(func (): return time_elapsed >= 2).completed()
+	await BdbPromise.poll(func (): return time_elapsed >= 2).completed()
 	expect(time_elapsed).to.be.gte(2, "Shouldve been called after ")
 	
-	
-func create_resolve_future(time:float) -> Future:
-	var future = Future.new()
+func create_resolve_future(time:float) -> BdbPromise:
+	var future = BdbPromise.new()
 	get_tree()\
 		.create_timer(time)\
 		.timeout\
 		.connect(func ():future.resolve(time))
 	return future
 	
-func create_reject_future(time:float) -> Future:
-	var future = Future.new()
+func create_reject_future(time:float) -> BdbPromise:
+	var future = BdbPromise.new()
 	get_tree()\
 		.create_timer(time)\
 		.timeout\
 		.connect(func ():future.reject(time))
 	return future
-
-"""

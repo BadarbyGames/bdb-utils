@@ -13,12 +13,15 @@ var fail_cb:Callable = noop
 
 func _init(initial_awaitable:Callable = noop):
 	if not is_same(initial_awaitable,noop):
-		timer(0.01).timeout.connect(func ():
+		get_coroutine().connect(func ():
 			match initial_awaitable.get_argument_count():
 				1: initial_awaitable.call(resolve)
 				2: initial_awaitable.call(resolve,reject)
 				_: assert(false,"Constructor callables must be created with either 1 or 2 args")
 			)
+	
+static func get_coroutine():
+	return Engine.get_main_loop().process_frame
 	
 static func timer(time=0.1):
 	return Engine.get_main_loop().create_timer(time)
@@ -95,7 +98,7 @@ func catch(_fail_cb:Callable = fail_cb)->BdbPromise:
 ## Returns the signal or a value
 func completed():
 	while not(is_fulfilled):
-		await timer().timeout # This converts it into an awaitable coroutine
+		await get_coroutine() # This converts it into an awaitable coroutine
 	return fulfilled
 
 ## Resolves the promise
