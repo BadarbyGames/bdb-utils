@@ -93,6 +93,23 @@ func it_all_only_resolves_after_all_promises_done():
 	expect(future3.fulfilled).to.equal([null,0.3])
 	expect(future_all.fulfilled).to.equal([[0.1,0.2,0.3],null])
 	
+func it_should_be_able_to_chain_returns():
+	var future1 := create_resolve_future(0.1)
+	var future2 := future1.then(func (time): return str("time ",time))
+	var future3 := future2.then(func (new_str): return str(new_str," yall"))
+		
+	await future2.completed()
+	expect(future2.fulfilled).to.equal(["time 0.1",null])
+	await future3.completed()
+	expect(future3.fulfilled).to.equal(["time 0.1 yall",null])
+	
+func it_should_be_able_to_unwrap_promises():
+	var future1 := create_resolve_future(0.1)
+	var future2 := BdbPromise.resolved(future1)
+	
+	await future2.completed()
+	expect(future2.fulfilled).to.equal([0.1,null])
+	
 	
 var time_elapsed := float(0)
 func _process(delta: float) -> void:

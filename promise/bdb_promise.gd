@@ -41,6 +41,8 @@ static func poll(predicate:Callable, sec:float = 0.1, promise:BdbPromise = null)
 	
 ## Creates a new promise
 static func resolved(v) -> BdbPromise:
+	if v is BdbPromise:
+		return v
 	var pr = BdbPromise.new()
 	pr.fulfilled = v
 	pr.is_fulfilled = true
@@ -75,11 +77,12 @@ func then(_success_cb:Callable = success_cb, _fail_cb:Callable = fail_cb)->BdbPr
 	
 	# Rewrapping is to ensure the callback always fits
 	success_cb = func (arg = null):
+		var return_value = arg
 		match _success_cb.get_argument_count():
-			0: _success_cb.call()
-			1: _success_cb.call(arg)
+			0: return_value = _success_cb.call()
+			1: return_value = _success_cb.call(arg)
 			_: assert(false,"Then callbacks must be created with between 0-1 args got %s" % _success_cb.get_argument_count())
-		new_pr.resolve(arg)
+		new_pr.resolve(return_value)
 		
 	fail_cb = func (arg = null):
 		match _fail_cb.get_argument_count():
@@ -89,13 +92,14 @@ func then(_success_cb:Callable = success_cb, _fail_cb:Callable = fail_cb)->BdbPr
 		new_pr.reject(arg)
 			
 	if is_fulfilled:
-		success_cb.call()
+		success_cb.call(fulfilled)
 	return new_pr
 	
 func catch(_fail_cb:Callable = fail_cb)->BdbPromise:
 	return then(success_cb,_fail_cb)
 
 ## Returns the signal or a value
+## e.g.  await do_something().completed()
 func completed():
 	while not(is_fulfilled):
 		await get_coroutine() # This converts it into an awaitable coroutine
