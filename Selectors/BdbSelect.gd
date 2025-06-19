@@ -11,8 +11,8 @@ static func child_by_type(parent:Node, type):
 static func item_by_type(items:Array, type):
 	for i in items: if is_instance_of(i, type): return i
 	
-static func children_by_type(parent:Node, type):
-	return items_by_type(parent.get_children(),type)
+static func children_by_type(parent:Node, type, result:Variant = []):
+	return items_by_type(parent.get_children(),type, result)
  
 """
 Override result

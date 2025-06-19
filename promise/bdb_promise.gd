@@ -13,12 +13,14 @@ var fail_cb:Callable = noop
 
 func _init(initial_awaitable:Callable = noop):
 	if not is_same(initial_awaitable,noop):
+		reference()  # if we dont increase counter, this will be freed
+		# before the promise is even resolved
 		get_coroutine().connect(func ():
 			match initial_awaitable.get_argument_count():
 				1: initial_awaitable.call(resolve)
 				2: initial_awaitable.call(resolve,reject)
 				_: assert(false,"Constructor callables must be created with either 1 or 2 args")
-			)
+			, CONNECT_ONE_SHOT)
 	
 static func get_coroutine():
 	return Engine.get_main_loop().process_frame
@@ -118,6 +120,9 @@ func resolve(v = null):
 	
 	on_resolved.emit()
 	
+	if unreference():
+		free()
+	
 var _debug_info:Dictionary = {}
 func bind_debug_info(dict:Dictionary):
 	_debug_info.merge(dict, true)
@@ -134,3 +139,5 @@ func reject(err = null):
 		_: assert(false,"Then callbacks must be created with between 0-1 args")
 	
 	on_resolved.emit()
+	if unreference():
+		free()
