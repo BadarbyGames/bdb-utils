@@ -1,46 +1,26 @@
 extends Node
 
-const LEVEL_WARN = 0
-const LEVEL_ERROR = 1
-const LEVEL_LOG = 2
-const LEVEL_INF = 3
+const LEVEL_WARN = InstanceLogger.LEVEL_WARN
+const LEVEL_ERROR = InstanceLogger.LEVEL_ERROR
+const LEVEL_LOG = InstanceLogger.LEVEL_LOG
+const LEVEL_INF = InstanceLogger.LEVEL_INF
+
+static var _global_logger := InstanceLogger.new("GLOBAL")
 
 static func _log(prefix, a = GD_UNDEF, b = GD_UNDEF, c = GD_UNDEF, d = GD_UNDEF):
-	var to_print = [prefix + ": "]
-	if GD_UNDEF.is_defined(a): to_print.append_array([&" ",a])
-	if GD_UNDEF.is_defined(b): to_print.append_array([&" ",b])
-	if GD_UNDEF.is_defined(c): to_print.append_array([&" ",c])
-	if GD_UNDEF.is_defined(d): to_print.append_array([&" ",d])
-	print.callv(to_print)
+	_global_logger.log(prefix, a, b, c, d)
 	
 static func error(correlation_id, a, b = GD_UNDEF, c = GD_UNDEF, d = GD_UNDEF):
-	if LEVEL_ERROR > ProjectSettings.get("kkSettings/log_level"): return
-	if correlation_id == null:
-		correlation_id = Time.get_ticks_msec()
-	
-	var prefix = str("[ERROR ", get_peer_id(), " cid: ",correlation_id,"]")
-	_log(prefix,a,b,c,d)
-	for ln in get_stack():
-		_log(prefix,str(ln.source," ",ln.function,":",ln.line))
+	_global_logger.error(correlation_id, a, b, c, d)
 
 static func warn(correlation_id, a, b = GD_UNDEF, c = GD_UNDEF, d = GD_UNDEF):
-	if LEVEL_WARN > ProjectSettings.get("kkSettings/log_level"): return
-	if correlation_id == null:
-		correlation_id = Time.get_ticks_msec()
-	_log(str("[WARN ", get_peer_id(), " cid: ",correlation_id,"]"), a,b,c,d)
+	_global_logger.warn(correlation_id, a, b, c, d)
 		
 static func log(correlation_id, a, b = GD_UNDEF, c = GD_UNDEF, d = GD_UNDEF):
-	if LEVEL_LOG > ProjectSettings.get("kkSettings/log_level"): return
-	if correlation_id == null:
-		correlation_id = Time.get_ticks_msec()
-	_log(str("[LOG ", get_peer_id(), " cid: ",correlation_id,"]"), a,b,c,d)
+	_global_logger.log(correlation_id, a, b, c, d)
 		
 static func info(correlation_id, a, b = GD_UNDEF, c = GD_UNDEF, d = GD_UNDEF):
-	if LEVEL_INF > ProjectSettings.get("kkSettings/log_level"): return
-	
-	if correlation_id == null:
-		correlation_id = Time.get_ticks_msec()
-	_log(str("[INFO ", get_peer_id(), " cid: ",correlation_id,"]"), a,b,c,d)
+	_global_logger.info(correlation_id, a, b, c, d)
 
 static func get_peer_id():
 	if Engine.is_editor_hint():
