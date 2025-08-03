@@ -76,6 +76,7 @@ static func all(args:Array)->BdbPromise:
 
 func then(_success_cb:Callable = success_cb, _fail_cb:Callable = fail_cb)->BdbPromise:
 	var new_pr = BdbPromise.new()
+	reference()
 	
 	# Rewrapping is to ensure the callback always fits
 	success_cb = func (arg = null):
@@ -85,6 +86,7 @@ func then(_success_cb:Callable = success_cb, _fail_cb:Callable = fail_cb)->BdbPr
 			1: return_value = _success_cb.call(arg)
 			_: assert(false,"Then callbacks must be created with between 0-1 args got %s" % _success_cb.get_argument_count())
 		new_pr.resolve(return_value)
+		unreference()
 		
 	fail_cb = func (arg = null):
 		match _fail_cb.get_argument_count():
@@ -92,6 +94,7 @@ func then(_success_cb:Callable = success_cb, _fail_cb:Callable = fail_cb)->BdbPr
 			1: _fail_cb.call(arg)
 			_: assert(false,"Then callbacks must be created with between 0-1 args got %s" % _fail_cb.get_argument_count())
 		new_pr.reject(arg)
+		unreference()
 			
 	if is_fulfilled:
 		success_cb.call(fulfilled)
@@ -103,8 +106,10 @@ func catch(_fail_cb:Callable = fail_cb)->BdbPromise:
 ## Returns the signal or a value
 ## e.g.  await do_something().completed()
 func completed():
+	reference()
 	while not(is_fulfilled):
 		await get_coroutine() # This converts it into an awaitable coroutine
+	unreference()
 	return fulfilled
 
 ## Resolves the promise
