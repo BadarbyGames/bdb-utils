@@ -13,6 +13,13 @@ static func item_by_type(items:Array, type):
 	
 static func children_by_type(parent:Node, type, result:Variant = []):
 	return items_by_type(parent.get_children(),type, result)
+	
+static func children_by_type_recursive(parent:Node, type, result:Variant = []):
+	var children = parent.get_children()
+	items_by_type(children,type, result)
+	for child in children:
+		children_by_type_recursive(child,type,result)
+	return result
  
 """
 Override result
