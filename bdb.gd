@@ -13,3 +13,5 @@ static func is_instance_will_be_valid(n:Node):
 
 static func exec(cb:Callable):
 	return cb.call()
+
+static func noop(a = null,b = null,c = null,d = null,e = null): return

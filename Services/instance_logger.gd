@@ -29,15 +29,15 @@ var is_atleast_debug:bool:
 func _init(_source) -> void:
 	source = _source
 
-func _log(prefix, a = GD_UNDEF, b = GD_UNDEF, c = GD_UNDEF, d = GD_UNDEF):
+func _log(prefix, a = BDB_UNDEF, b = BDB_UNDEF, c = BDB_UNDEF, d = BDB_UNDEF):
 	var to_print = [prefix + ": "]
-	if GD_UNDEF.is_defined(a): to_print.append_array([&" ",a])
-	if GD_UNDEF.is_defined(b): to_print.append_array([&" ",b])
-	if GD_UNDEF.is_defined(c): to_print.append_array([&" ",c])
-	if GD_UNDEF.is_defined(d): to_print.append_array([&" ",d])
+	if BDB_UNDEF.is_defined(a): to_print.append_array([&" ",a])
+	if BDB_UNDEF.is_defined(b): to_print.append_array([&" ",b])
+	if BDB_UNDEF.is_defined(c): to_print.append_array([&" ",c])
+	if BDB_UNDEF.is_defined(d): to_print.append_array([&" ",d])
 	print.callv(to_print)
 	
-func fatal(correlation_id, a, b = GD_UNDEF, c = GD_UNDEF, d = GD_UNDEF):
+func fatal(correlation_id, a, b = BDB_UNDEF, c = BDB_UNDEF, d = BDB_UNDEF):
 	if correlation_id == null:
 		correlation_id = Time.get_ticks_msec()
 	
@@ -46,7 +46,7 @@ func fatal(correlation_id, a, b = GD_UNDEF, c = GD_UNDEF, d = GD_UNDEF):
 	for ln in get_stack():
 		_log(prefix,str(ln.source," ",ln.function,":",ln.line))
 	
-func error(correlation_id, a, b = GD_UNDEF, c = GD_UNDEF, d = GD_UNDEF):
+func error(correlation_id, a, b = BDB_UNDEF, c = BDB_UNDEF, d = BDB_UNDEF):
 	if !is_atleast_error: return
 	if correlation_id == null:
 		correlation_id = Time.get_ticks_msec()
@@ -56,19 +56,19 @@ func error(correlation_id, a, b = GD_UNDEF, c = GD_UNDEF, d = GD_UNDEF):
 	for ln in get_stack():
 		_log(prefix,str(ln.source," ",ln.function,":",ln.line))
 
-func warn(correlation_id, a, b = GD_UNDEF, c = GD_UNDEF, d = GD_UNDEF):
+func warn(correlation_id, a, b = BDB_UNDEF, c = BDB_UNDEF, d = BDB_UNDEF):
 	if !is_atleast_warn: return
 	if correlation_id == null:
 		correlation_id = Time.get_ticks_msec()
 	_log(str("[WARN pid:", get_peer_id()," source: ",source, " cid: ",correlation_id,"]"), a,b,c,d)
 		
-func info(correlation_id, a, b = GD_UNDEF, c = GD_UNDEF, d = GD_UNDEF):
+func info(correlation_id, a, b = BDB_UNDEF, c = BDB_UNDEF, d = BDB_UNDEF):
 	if !is_atleast_info: return
 	if correlation_id == null:
 		correlation_id = Time.get_ticks_msec()
 	_log(str("[INFO pid:", get_peer_id()," source: ",source, " cid: ",correlation_id,"]"), a,b,c,d)
 		
-func debug(correlation_id, a, b = GD_UNDEF, c = GD_UNDEF, d = GD_UNDEF):
+func debug(correlation_id, a, b = BDB_UNDEF, c = BDB_UNDEF, d = BDB_UNDEF):
 	if !is_atleast_debug: return
 	
 	if correlation_id == null:

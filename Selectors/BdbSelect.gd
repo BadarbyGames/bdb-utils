@@ -1,12 +1,56 @@
+@tool
 class_name BdbSelect
 
 static func node(n:Node):
 	assert(n, "Node is required but not founnd")
 	return n
 	
+#region SIBLINGS
+static func next_sibling(node:Node): return next_sibling_by_type(node, null)
+static func prev_sibling(node:Node): return prev_sibling_by_type(node, null)
+
+static func next_sibling_by_type(node:Node, type):
+	var parent := node.get_parent()
+	var count := parent.get_child_count()
+	var sibling_index := node.get_index() + 1
+	
+	if 0 <= sibling_index and sibling_index < count:
+		var sibling := parent.get_child(sibling_index)
+		
+		# If the wrong type, then move to next sibling
+		if type and not(is_instance_of(sibling, type)):
+			next_sibling_by_type(sibling, type)
+		return sibling
+	return null
+
+static func prev_sibling_by_type(node:Node, type):
+	var parent := node.get_parent()
+	var count := parent.get_child_count()
+	var sibling_index := node.get_index() - 1
+	
+	if 0 <= sibling_index and sibling_index < count:
+		var sibling := parent.get_child(sibling_index)
+		# If the wrong type, then move to next sibling
+		if type and not(is_instance_of(sibling, type)):
+			prev_sibling_by_type(sibling, type)
+	return null
+#endregion
+	
 #region by_type
 static func child_by_type(parent:Node, type):
 	return item_by_type(parent.get_children(),type)
+	
+static func child_by_type_recursive(parent:Node, type):
+	var children = parent.get_children()
+	
+	var result = item_by_type(children,type)
+	if result: return result
+	
+	for child in children:
+		var tmp = child_by_type_recursive(child, type)
+		if tmp: return tmp
+		
+	return null
 	  
 static func item_by_type(items:Array, type):
 	for i in items: if is_instance_of(i, type): return i

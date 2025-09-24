@@ -13,10 +13,10 @@ static func append_path(path:NodePath, appendee:String) -> NodePath:
 	path_string += appendee
 	return NodePath(path_string)
 
-static func join(a, b, c = GD_UNDEF, d = GD_UNDEF) -> NodePath:
+static func join(a, b, c = BDB_UNDEF, d = BDB_UNDEF) -> NodePath:
 	var to_join: = [a,b]
-	if GD_UNDEF.is_defined(c): to_join.append(c)
-	if GD_UNDEF.is_defined(d): to_join.append(d)
+	if BDB_UNDEF.is_defined(c): to_join.append(c)
+	if BDB_UNDEF.is_defined(d): to_join.append(d)
 	return NodePath("".join(to_join))
 
 static func get_value(node:Node, node_path:NodePath):
