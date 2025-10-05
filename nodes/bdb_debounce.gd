@@ -14,10 +14,10 @@ func _init(secs = 1) -> void:
 	one_shot = true
 	
 func cb(callable:Callable):
-	timeout.connect(callable)
-	return cb_handle
+	timeout.connect(func (): callable.callv(params_array))
+	return self
 
-func cb_handle(...args:Array):
+func handle(...args:Array):
 	params_array = args
 	stop()
 	start(debounce_secs)
@@ -32,11 +32,6 @@ func cb_0_callback():
 	printerr("@@ cb_0 deprecated, use cb")
 	stop()
 	start(debounce_secs)
-
-func cb_1(callable:Callable):
-	printerr("@@ cb_0 deprecated, use cb")
-	timeout.connect(func(): callable.callv(params_array))
-	return cb_1_callback
 
 func cb_1_callback(param):
 	printerr("@@ cb_0 deprecated, use cb")
